@@ -62,7 +62,8 @@ Visit http://127.0.0.1:8000 in your browser.
 🧭 App Flow
 Land on the Login/Register page.
 
-Register as a new user and you'll be redirected to the login page.
+Register as a new user and you'll be redirected to the login page. 
+{can consider "Nagendra" and "Pratik0311@" as demo username and password OR you can make it as per your choice}
 
 Login using your credentials.
 
