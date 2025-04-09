@@ -1,0 +1,161 @@
+{% load django_browser_reload %} {% django_browser_reload_script %} {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuoraLite</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome (for icons) -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    .card {
+      margin-top: 20px;
+    }
+    .form-outline{
+      margin-top : 20px;
+      margin-bottom : 20px;
+      max-width : 300px;
+    }
+  </style>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <!-- Container wrapper -->
+      <div class="container-fluid">
+        <!-- Toggle button -->
+        <button
+          data-mdb-collapse-init
+          class="navbar-toggler"
+          type="button"
+          data-mdb-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <!-- Left links -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="#"><h5>QuoraLite</h5></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/">Explore</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Your Question</a>
+            </li>
+          </ul>
+          <!-- Left links -->
+        </div>
+
+        <!-- Collapsible wrapper -->
+
+        <!-- Right elements -->
+        <div class="d-flex align-items-center">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="#">Hi {{user.username}}</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+              <a class="nav-link" href="logout">Logout</a>
+            </li>
+          </ul>
+        </div>
+        <!-- Right elements -->
+      </div>
+      <!-- Container wrapper -->
+    </nav>
+    <!-- Navbar -->
+    <div class="d-flex align-items-center gap-4">
+  <h1 class="mb-0">Your Questions</h1>
+
+  <form action="" method="POST" class="flex-grow-1 d-flex align-items-center gap-3">
+    {% csrf_token %}
+    <div class="form-outline">
+      <textarea 
+        class="form-control" 
+        id="questionTextarea" 
+        rows="2" 
+        name="question_text" 
+        placeholder="Type your question here..."
+        required
+      ></textarea>
+      <label class="form-label" for="questionTextarea">Add a New Question</label>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+  </form>
+</div>
+
+
+    </div>
+    
+
+    {% for question in data %}
+    <div class="card">
+      <div class="card-header">{{question.question_details.question_text}}</div>
+      <div class="card-body">
+        {% if question.answer_details|length > 0 %} 
+          {% for answer in question.answer_details %}
+          <blockquote class="blockquote mb-0">
+            <p>{{answer.answer_details.answer_text}}</p>
+            <div class="d-flex align-items-center gap-2">
+              <footer class="blockquote-footer">
+                Answered By - {{answer.answer_details.user.username}}
+              </footer>
+              <form
+                action="{% url 'liking' answer_id=answer.answer_details.id%}"
+                method="POST"
+              >
+                {% csrf_token %}
+                <input type="hidden" name="re" value="yourquestions">
+                <button
+                  type="submit"
+                  style="border: none; background: none; padding: 0"
+                >
+                  {% if question.question_details.no_of_answers > 0 %} 
+                  {% if answer.likes > 0 %}
+                  <i class="fas fa-heart" style="color: red; cursor: pointer"></i>
+                  {% else %}
+                  <i
+                    class="fas fa-heart"
+                    style="color: black; cursor: pointer"
+                  ></i>
+                  {% endif %} 
+                  {% endif %}
+                </button>
+              </form>
+            </div>
+
+            <hr />
+          </blockquote>
+          {% endfor %} 
+        {% else %}
+        <blockquote class="blockquote mb-0">
+          <p>Not Answered Yet</p>
+        </blockquote>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"
+    ></script>
+  </body>
+</html>

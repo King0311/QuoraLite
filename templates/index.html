@@ -1,0 +1,145 @@
+{% load django_browser_reload %} {% django_browser_reload_script %} 
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QuoraLite</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome (for icons) -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <style>
+    .questions {
+      margin-top: 20px;
+    }
+  </style>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <!-- Container wrapper -->
+      <div class="container-fluid">
+        <!-- Toggle button -->
+        <button
+          data-mdb-collapse-init
+          class="navbar-toggler"
+          type="button"
+          data-mdb-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Collapsible wrapper -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <!-- Left links -->
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="#"><h5>QuoraLite</h5></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/">Explore</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="yourquestions">Your Question</a>
+            </li>
+          </ul>
+          <!-- Left links -->
+        </div>
+
+        <!-- Collapsible wrapper -->
+
+        <!-- Right elements -->
+        <div class="d-flex align-items-center">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link" href="#">Hi {{user.username}}</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+              <a class="nav-link" href="logout">Logout</a>
+            </li>
+          </ul>
+        </div>
+        <!-- Right elements -->
+      </div>
+      <!-- Container wrapper -->
+    </nav>
+    <!-- Navbar -->
+    <div class="questions">
+      {% for question in question_with_top_answers %}
+      <div class="card">
+        <div class="card-header">{{question.question_details}}</div>
+        <div class="card-body">
+          <h5 class="card-title">Answer</h5>
+          <p class="card-text">{{question.answer_detail}}</p>
+          <div class="d-flex align-items-center gap-2">
+            <!-- Heart Icon -->
+            <form action="{% url 'liking' answer_id=question.answer_id %}" method="POST">
+              {% csrf_token %}
+              <input type="hidden" name="re" value="">
+              <button
+                type="submit"
+                style="border: none; background: none; padding: 0"
+              >
+                {% if question.answer_count > 0 %} {% if question.liked == 1 %}
+                <i class="fas fa-heart" style="color: red; cursor: pointer"></i>
+                {% else %}
+                <i
+                  class="fas fa-heart"
+                  style="color: black; cursor: pointer"
+                ></i>
+                {% endif %} {% endif %}
+              </button>
+            </form>
+
+            <!-- Conditional Button Block -->
+            {% if question.answer_count == 0 and question.question_user_id != user.id%}
+            <a href="{% url 'viewall' question_id=question.question_id %}" class="btn btn-primary" data-mdb-ripple-init
+              >Add First Answer</a
+            >
+            {% elif question.answer_count == 0 and question.question_user_id == user.id%}
+            <a href="#" class="btn btn-primary" data-mdb-ripple-init
+              >No Answer Yet( You cannot add answer since it is your question )</a
+            >
+            {% elif question.answer_count == 1 and question.question_user_id != user.id %}
+            <a href="{% url 'viewall' question_id=question.question_id %}" class="btn btn-primary" data-mdb-ripple-init
+              >Add Answer</a
+            >
+            {% elif question.answer_count == 1 and question.question_user_id == user.id %}
+            <a href="{% url 'viewall' question_id=question.question_id %}" class="btn btn-primary" data-mdb-ripple-init
+              >View Answer( You cannot add answer since it is your question )</a
+            >
+            {% elif question.answer_count > 1 and question.question_user_id != user.id %}
+            <a href={% url 'viewall' question_id=question.question_id %} class="btn btn-primary" data-mdb-ripple-init
+              >View All Answer</a
+            >
+            {% elif question.answer_count > 1 and question.question_user_id == user.id %}
+            <a href={% url 'viewall' question_id=question.question_id %} class="btn btn-primary" data-mdb-ripple-init
+              >View All Answer( You cannot add answer since it is your question )</a
+            >
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <hr />
+      {% endfor %}
+    </div>
+
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.js"
+    ></script>
+  </body>
+</html>
